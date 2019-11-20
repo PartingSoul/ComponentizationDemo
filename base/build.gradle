@@ -1,0 +1,50 @@
+apply plugin: 'com.android.library'
+
+def appVersion = rootProject.ext.appVersion
+def supportDependencies = rootProject.ext.dependencies
+def supportAnnotationProcessor = rootProject.ext.annotationProcessor
+
+android {
+    compileSdkVersion appVersion.compileSdkVersion
+
+    defaultConfig {
+        minSdkVersion appVersion.minSdkVersion
+        targetSdkVersion appVersion.targetSdkVersion
+        versionCode 1
+        versionName "1.0"
+        multiDexEnabled true
+        testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+    }
+
+
+    buildTypes {
+        release {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+        }
+
+    }
+
+    //加载aar包需要
+    repositories {
+        flatDir {
+            dirs '../base/libs'
+        }
+    }
+
+}
+
+dependencies {
+    implementation fileTree(include: ['*.jar'], dir: 'libs')
+
+    supportDependencies.each {
+        k, v -> implementation v
+    }
+
+    supportAnnotationProcessor.each {
+        k, v -> annotationProcessor v
+    }
+
+    api project(':arouter_common')
+    api project(':annoation')
+}

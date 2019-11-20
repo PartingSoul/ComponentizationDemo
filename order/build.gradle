@@ -1,0 +1,71 @@
+if (isRelease) {
+    //集成化模式
+    apply plugin: 'com.android.library'
+} else {
+    apply plugin: 'com.android.application'
+}
+
+
+def appVersion = rootProject.ext.appVersion
+def supportDependencies = rootProject.ext.dependencies
+def supportAnnotationProcessor = rootProject.ext.annotationProcessor
+
+android {
+    compileSdkVersion appVersion.compileSdkVersion
+    buildToolsVersion appVersion.buildToolsVersion
+
+
+    defaultConfig {
+        if (!isRelease) {
+            applicationId "com.parting_soul.order"
+        }
+        minSdkVersion appVersion.minSdkVersion
+        targetSdkVersion appVersion.targetSdkVersion
+        versionCode 1
+        versionName "1.0"
+
+        testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+
+    }
+
+    buildTypes {
+        release {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+        }
+    }
+
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
+    }
+
+    sourceSets {
+        main {
+            if (!isRelease) {
+                //组件化模式
+                manifest.srcFile 'src/debug/AndroidManifest.xml'
+            } else {
+                //集成模式
+                manifest.srcFile 'src/main/AndroidManifest.xml'
+                java {
+                    //不打包debug目录下的java文件
+                    exclude '**/debug/**'
+                }
+            }
+        }
+    }
+
+}
+
+dependencies {
+    implementation fileTree(dir: 'libs', include: ['*.jar'])
+    implementation project(path: ':base')
+    supportDependencies.each {
+        k, v -> implementation v
+    }
+
+    supportAnnotationProcessor.each {
+        k, v -> annotationProcessor v
+    }
+}

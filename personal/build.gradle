@@ -1,0 +1,53 @@
+if (isRelease) {
+    apply plugin: 'com.android.library'
+} else {
+    apply plugin: 'com.android.application'
+}
+
+def appVersion = rootProject.ext.appVersion
+def supportDependencies = rootProject.ext.dependencies
+def supportAnnotationProcessor = rootProject.ext.annotationProcessor
+
+android {
+    compileSdkVersion appVersion.compileSdkVersion
+    buildToolsVersion appVersion.buildToolsVersion
+
+
+    defaultConfig {
+        if (!isRelease) {
+            applicationId "com.parting_soul.personal"
+        }
+        minSdkVersion appVersion.minSdkVersion
+        targetSdkVersion appVersion.targetSdkVersion
+        versionCode 1
+        versionName "1.0"
+
+        testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+
+    }
+
+    buildTypes {
+        release {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+        }
+    }
+
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
+    }
+
+}
+
+dependencies {
+    implementation fileTree(dir: 'libs', include: ['*.jar'])
+    implementation project(path: ':base')
+    supportDependencies.each {
+        k, v -> implementation v
+    }
+
+    supportAnnotationProcessor.each {
+        k, v -> annotationProcessor v
+    }
+}
